@@ -4,6 +4,10 @@ simu.name = as.character(args[1])
 
 source(paste(simu.name, "_paramFile.r", sep=""))
 
+# random seed
+rnd.seed = as.numeric(args[2])
+simu.name = paste(simu.name, rnd.seed, sep="_")
+
 #========================
 # build parameter table
 #========================
@@ -63,7 +67,8 @@ init.random = function(ntrees, tree.params, init.size, sd){
 
 init.even = function(ntrees, tree.params, init.size, sd){
 	set.seed(rnd.seed)
-	nbindiv = as.integer(nbindiv / nrow(tree.params))
+	nbindiv_by_sp = as.integer(nbindiv / nrow(tree.params))
+	rnd = rep(1:nrow(tree.params), each = nbindiv_by_sp)
 	trees = tree.params$sp[rnd]
 	set.seed(rnd.seed)
 	size = rnorm(ntrees, init.size, sd)
@@ -75,7 +80,7 @@ if(!ind_by_species %in% c("random", "even")) stop("wrong ind_by_species option")
 
 if(ind_by_species=="random") init.forest = init.random(nbindiv, tree.params, mean.init.tree.size, sd.init.tree.size)
 
-if(ind_by_species=="even") init.forest = init.even(nbindiv, tree.params, init.tree.size, init.tree.sd)
+if(ind_by_species=="even") init.forest = init.even(nbindiv, tree.params, mean.init.tree.size, sd.init.tree.size)
 
 
 init.forest$growth = rep(0, nbindiv)
